@@ -1,7 +1,10 @@
+package main_pakage;
+
 import GuiProject.GuiProgramThingWorx;
 import interfaces.InterfaceRs;
 import listeners.EventRsManageListener;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -15,18 +18,30 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.util.logging.Logger;
 
-public class SenderServicePostRequestHttpClient<T, T1 extends InterfaceRs> {
+public class SenderServicePostRequestHttpClient<T extends AbstractThingClass, T1 extends InterfaceRs> {
     private final String thingName;
     private final String serviceName;
     private final String appkey;
     private final String url;
     private ObjectMapper objMap = new ObjectMapper();
     private StringWriter writer;
-    private CloseableHttpClient client = HttpClientBuilder.create().build();
+    int timeout = 10;
+    RequestConfig config = RequestConfig.custom()
+            .setConnectTimeout(timeout * 1000)
+            //.setConnectionRequestTimeout(timeout * 1000)
+            //.setSocketTimeout(timeout * 1000)
+            .build();
+    private CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
     private T thingRq;
     private T1 thingRs;
     private HttpPost request;
+    private int statusCode;
+
+    public int getStatusCode() {
+        return statusCode;
+    }
 
     public SenderServicePostRequestHttpClient(String thingName, String serviceName, String appkey, String url, T thingRq, T1 thingRs) {
         this.thingName = "/Things/" + thingName;
@@ -39,6 +54,12 @@ public class SenderServicePostRequestHttpClient<T, T1 extends InterfaceRs> {
         request.setHeader("Content-Type", "application/json");
         request.setHeader("accept", "application/json");
         request.setHeader("appKey", this.appkey);
+        try {
+            HttpResponse response1  = client.execute(request);
+            statusCode = response1.getStatusLine().getStatusCode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void setThingRq(T thingRq) {
@@ -69,8 +90,7 @@ public class SenderServicePostRequestHttpClient<T, T1 extends InterfaceRs> {
             System.out.println(builder);
             System.out.println((T1) objMap.readValue(builder.toString(), thingRs.getClass()));
             thingRs.getObject((T1) objMap.readValue(builder.toString(), thingRs.getClass()));
-
-        } catch (IOException e) {
+        } catch (IOException e){
             e.printStackTrace();
         }
     }
@@ -102,19 +122,25 @@ public class SenderServicePostRequestHttpClient<T, T1 extends InterfaceRs> {
 
         long a = System.currentTimeMillis() + 60000;
         Thread thread = new Thread(() -> {
-            while (System.currentTimeMillis() < a) {
-                ssPr.doPostRequest();
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+          //  try {
+                while (System.currentTimeMillis() < a) {
+                    ssPr.doPostRequest();
                     try {
-                        ssPr.closeClient();
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        try {
+                            ssPr.closeClient();
+                        } catch (IOException ioException) {
+                            ioException.printStackTrace();
+                        }
                     }
                 }
-            }
+          //  }
+//            catch (IOException e) {
+//                Logger.getLogger("hi").warning("Подключение к серверу прервано! Повторите попытку");
+//                e.printStackTrace();
+//            }
         });
         thread.setDaemon(true);
         thread.start();
