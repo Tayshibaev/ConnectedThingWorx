@@ -36,9 +36,9 @@ public class TestGetPostRequest {
 //        System.out.println(connection.getResponseMessage());
 //        System.out.println(connection.getHeaderFields());
 //        if (responseCode == 200) {
-//            String response = "";
+          //  String response = "";
 //
-//            Scanner scanner = new Scanner(connection.getInputStream());
+          //  Scanner scanner = new Scanner(connection.getInputStream());
 //            while (scanner.hasNextLine()) {
 //                response += scanner.nextLine();
 //                response += "\n";
@@ -126,8 +126,10 @@ public class TestGetPostRequest {
             System.out.println(writer.toString());
             request.setEntity(new StringEntity(writer.toString()));
 
+            System.out.println(request);
             HttpResponse response = client.execute(request);
 
+            System.out.println(response);
             System.out.println(response.getStatusLine().getStatusCode());
             BufferedReader bufReader = new BufferedReader(new InputStreamReader(
                     response.getEntity().getContent()));
@@ -147,7 +149,7 @@ public class TestGetPostRequest {
             System.out.println("Lamp2 = ");
             System.out.println("OnePa = ");
 
-            request.setEntity(new StringEntity("{\"OneParam\" : \"13\", \"lamp2\" : \"65\"}"));
+            request.setEntity(new StringEntity("{\"OneParam\" : \"13\", \"lamp2\" : \"90\"}"));
 
             response = client.execute(request);
 

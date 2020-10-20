@@ -101,7 +101,7 @@ public class GuiProgramThingWorx extends JFrame {
             String thingName = textFieldThingName.getText();
             String serviceNamr = textFieldServiceName.getText();
             String appKey = textFieldAppKey.getText();
-            httpSender = new SenderServicePostRequestHttpClient(thingName, serviceNamr, appKey, url, thingOneRq, thingOneRs);
+            httpSender = new SenderServicePostRequestHttpClient(thingName, serviceNamr, appKey, url);
             statusCode = httpSender.getStatusCode();
             if (statusCode != 200) {
                 if(httpSender!=null){
@@ -118,7 +118,7 @@ public class GuiProgramThingWorx extends JFrame {
                 threadServerSender = new Thread(() -> {
                     try {
                         while (!Thread.currentThread().isInterrupted()) {
-                            httpSender.doPostRequest();
+                            httpSender.doPostRequest(thingOneRq, thingOneRs);
                             Thread.sleep(5000);
                         }
                     } catch (InterruptedException ex) {
@@ -146,7 +146,6 @@ public class GuiProgramThingWorx extends JFrame {
         panelTwo.setMinimumSize(new Dimension(100,100));
         panelThree.setMinimumSize(new Dimension(100,100));
         panelFour.setMinimumSize(new Dimension(100,100));
-
 
         panelOne.setBackground(Color.BLACK);
         //panelOne.setSize(new Dimension(100,100));
@@ -216,6 +215,6 @@ public class GuiProgramThingWorx extends JFrame {
     }
 
     public static void main(String[] args) {
-        new GuiProgramThingWorx("123");
+        SwingUtilities.invokeLater(()->new GuiProgramThingWorx("Program"));
     }
 }
