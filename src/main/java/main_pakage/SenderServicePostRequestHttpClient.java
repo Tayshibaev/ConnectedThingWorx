@@ -1,6 +1,6 @@
 package main_pakage;
 
-import GuiProject.GuiProgramThingWorx;
+import GuiProject.RemoteTerminal.GuiProgramThingWorx;
 import interfaces.InterfaceRs;
 import listeners.EventRsManageListener;
 import org.apache.http.HttpResponse;
@@ -19,10 +19,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public class SenderServicePostRequestHttpClient<T extends AbstractThingClass, T1 extends InterfaceRs> {
     private final String thingName;
@@ -38,7 +35,7 @@ public class SenderServicePostRequestHttpClient<T extends AbstractThingClass, T1
             //.setSocketTimeout(timeout * 1000)
             .build();
     private CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-//    private List<T> thingRq = new LinkedList<>();
+    //    private List<T> thingRq = new LinkedList<>();
 //    private List<T1> thingRs = new LinkedList<>();
     private Map<T, T1> mapThingsRqRs = new LinkedHashMap<>();
     private HttpPost request;
@@ -67,7 +64,7 @@ public class SenderServicePostRequestHttpClient<T extends AbstractThingClass, T1
         }
     }
 
-    public void addThinqs(T thinqRq, T1 thingRs){
+    public void addThinqs(T thinqRq, T1 thingRs) {
         mapThingsRqRs.put(thinqRq, thingRs);
     }
 
@@ -90,8 +87,8 @@ public class SenderServicePostRequestHttpClient<T extends AbstractThingClass, T1
 
     //исполнение запроса для всех вещей
     public void doPostRequestAllThinq() {
-        mapThingsRqRs.forEach((x,y)->{
-            doPostRequest(x,y);
+        mapThingsRqRs.forEach((x, y) -> {
+            doPostRequest(x, y);
         });
     }
 
@@ -103,18 +100,20 @@ public class SenderServicePostRequestHttpClient<T extends AbstractThingClass, T1
             request.setEntity(new StringEntity(writer.toString()));
             HttpResponse response = client.execute(request);
             System.out.println(response.getStatusLine().getStatusCode());
-            BufferedReader bufReader = new BufferedReader(new InputStreamReader(
-                    response.getEntity().getContent()));
+            if (thingRs != null) {
+                BufferedReader bufReader = new BufferedReader(new InputStreamReader(
+                        response.getEntity().getContent()));
 
-            StringBuilder builder = new StringBuilder();
-            String line;
-            while ((line = bufReader.readLine()) != null) {
-                builder.append(line);
-                builder.append(System.lineSeparator());
+                StringBuilder builder = new StringBuilder();
+                String line;
+                while ((line = bufReader.readLine()) != null) {
+                    builder.append(line);
+                    builder.append(System.lineSeparator());
+                }
+                System.out.println(builder);
+                System.out.println((T1) objMap.readValue(builder.toString(), thingRs.getClass()));
+                thingRs.getObject((T1) objMap.readValue(builder.toString(), thingRs.getClass()));
             }
-            System.out.println(builder);
-            System.out.println((T1) objMap.readValue(builder.toString(), thingRs.getClass()));
-            thingRs.getObject((T1) objMap.readValue(builder.toString(), thingRs.getClass()));
         } catch (IOException e) {
             e.printStackTrace();
         }

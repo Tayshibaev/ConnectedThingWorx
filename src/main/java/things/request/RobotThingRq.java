@@ -5,41 +5,41 @@ import things.AbstractThingClass;
 
 @JsonAutoDetect
 public class RobotThingRq extends AbstractThingClass {
-    private volatile double countBut1;
-    private volatile double countBut2;
+    private volatile double m11;
+    private volatile double l11;
 
     public RobotThingRq() {
     }
 
-    public void setCountBut1(double countBut1) {
-        this.countBut1 = countBut1;
+    public void setM11(double m11) {
+        this.m11 = m11;
     }
 
-    public void setCountBut2(double countBut2) {
-        this.countBut2 = countBut2;
+    public void setL11(double l11) {
+        this.l11 = l11;
     }
 
-    public synchronized double getCountBut1() {
-        return countBut1;
+    public synchronized double getM11() {
+        return m11;
     }
 
-    public synchronized double getCountBut2() {
-        return countBut2;
+    public synchronized double getL11() {
+        return l11;
     }
 
     public synchronized void addCountBtn1(){
-        countBut1++;
+        m11++;
     }
 
     public synchronized void addCountBtn2(){
-        countBut2++;
+        l11++;
     }
 
     @Override
     public String toString() {
         return "ThingOneRq{" +
-                "countBut1=" + countBut1 +
-                ", countBut2=" + countBut2 +
+                "m11=" + m11 +
+                ", l11=" + l11 +
                 '}';
     }
 }
