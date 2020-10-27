@@ -99,18 +99,18 @@ public class SenderServicePostRequestHttpClient<T extends AbstractThingClass, T1
             System.out.println(String.format("Сформирован объект JSON для передачи данных на сервер %s", writer.toString()));
             request.setEntity(new StringEntity(writer.toString()));
             HttpResponse response = client.execute(request);
+            request.setEntity(null);
             System.out.println(response.getStatusLine().getStatusCode());
+            BufferedReader bufReader = new BufferedReader(new InputStreamReader(
+                    response.getEntity().getContent()));
+            StringBuilder builder = new StringBuilder();
+            String line;
+            while ((line = bufReader.readLine()) != null) {
+                builder.append(line);
+                builder.append(System.lineSeparator());
+            }
+            System.out.println(builder);
             if (thingRs != null) {
-                BufferedReader bufReader = new BufferedReader(new InputStreamReader(
-                        response.getEntity().getContent()));
-
-                StringBuilder builder = new StringBuilder();
-                String line;
-                while ((line = bufReader.readLine()) != null) {
-                    builder.append(line);
-                    builder.append(System.lineSeparator());
-                }
-                System.out.println(builder);
                 System.out.println((T1) objMap.readValue(builder.toString(), thingRs.getClass()));
                 thingRs.getObject((T1) objMap.readValue(builder.toString(), thingRs.getClass()));
             }

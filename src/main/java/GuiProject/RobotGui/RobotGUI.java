@@ -1,6 +1,5 @@
 package GuiProject.RobotGui;
 
-import GuiProject.RemoteTerminal.GuiProgramThingWorx;
 import events.EventRs;
 import interfaces.EventRsListenerInterface;
 import interfaces.InterfaceRs;
@@ -16,6 +15,10 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class RobotGUI extends JFrame {
     private JPanel mainPanel;
@@ -34,29 +37,41 @@ public class RobotGUI extends JFrame {
     private JLabel connectedLbl;
     private JPanel MotorPanel;
     private JTextField textL4;
-    private JTextField textField2;
-    private JTextField textField3;
-    private JTextField textField4;
-    private JTextField textField5;
-    private JTextField textField6;
-    private JTextField textField7;
-    private JTextField textField8;
-    private JTextField textField9;
-    private JTextField textField10;
-    private JTextField textField11;
+    private JTextField textT4;
+    private JTextField textM4;
+    private JTextField textL5;
+    private JTextField textT5;
+    private JTextField textM5;
+    private JTextField textL6;
+    private JTextField textT6;
+    private JTextField textM6;
+    private JTextField textM3;
+    private JTextField textT3;
     private JTextField textL3;
     private JTextField textL2;
-    private JTextField textField14;
-    private JTextField textField15;
-    private JTextField textField16;
-    private JTextField textField17;
+    private JTextField textT2;
+    private JTextField textM2;
+    private JTextField textM1;
+    private JTextField textT1;
     private JTextField textL1;
+
+    private List<JTextField> listL = Arrays.asList(textL1, textL2, textL3, textL4, textL5, textL6);
+    private List<JTextField> listT = Arrays.asList(textT1, textT2, textT3, textT4, textT5, textT6);
+    private List<JTextField> listM = Arrays.asList(textM1, textM2, textM3, textM4, textM5, textM6);
+
     private JPanel PanelLoad;
     private JPanel panelTemp;
     private JPanel panelPosition;
-    private JTextField motorLoad;
-    private JTextField motorTemp;
-    private JButton sendMotorData;
+    private JLabel LoadMotor;
+    private JLabel TempMotor;
+    private JLabel PositionMotor;
+    private JButton sendMotorDataBtn;
+    private JTextField textStasus;
+    private JTextField textNumCommand;
+    private JPanel statusAndNumCommPane;
+    private JLabel Status;
+    private JLabel NumCommand;
+    private JButton rndValueMotorBtn;
     private JPanel panelOne;
     private JPanel panelTwo;
     private JPanel panelThree;
@@ -70,8 +85,6 @@ public class RobotGUI extends JFrame {
     private Thread threadServerSender = new Thread();
 
     private void initParamsGui() {
-        lableBtn1.setText("Нажми на кнопку");
-        lableBtn2.setText("Нажми на кнопку");
         connectedLbl.setText("Ответ от сервера");
         appKeyLabel.setText("Введите ваш appKey для доступа к серверу");
         serviceNameLabel.setText("Введите название вызываемого Сервиса");
@@ -79,27 +92,61 @@ public class RobotGUI extends JFrame {
         urlLabel.setText("Введите url сервера");
         connectedBtn.setText("Click for Connection to server");
 
-        textFieldThingName.setText("TwoThing");
-        textFieldServiceName.setText("Service2");
-        textFieldAppKey.setText("9adde0b8-fc59-43ba-89dd-5aaf03e1952c");
-        textFieldUrl.setText("https://pp-20091114071y.devportal.ptc.io/Thingworx");
+        textFieldThingName.setText("Robot_1");
+        textFieldServiceName.setText("robot_service");
+        textFieldAppKey.setText("a99e84db-d28d-4aa8-86b6-2d63b5299d5f");
+        textFieldUrl.setText("https://pp-20101315258i.devportal.ptc.io/Thingworx");
+    }
+
+    //Длч установки в текстовые поля рандомных значений
+    private void setRndValueTextField(List<JTextField> list) {
+        list.forEach((textField) -> {
+            textField.setText(String.valueOf(ThreadLocalRandom.current().nextInt(100, 600)));
+        });
+    }
+
+    private List<Double> getValueTextField(List<JTextField> list) {
+        List<Double> listD = new ArrayList<>();
+        list.forEach((x) -> {
+            listD.add(Double.parseDouble(x.getText()));
+        });
+        return listD;
     }
 
     RobotThingRq rbThing = new RobotThingRq();
-    private void motorSettings(){
-        motorLoad.setText("311");
-        motorTemp.setText("100");
-        sendMotorData.addActionListener((e)->{
-            rbThing.setM11(Double.parseDouble(motorLoad.getText()));
-            rbThing.setL11(Double.parseDouble(motorTemp.getText()));
-            httpSender.doPostRequest(rbThing, null);
+
+    private void motorSettings() {
+
+        sendMotorDataBtn.setText("Отправить данные на сервер");
+        rndValueMotorBtn.setText("Задать новые значение для данных мотора");
+        LoadMotor.setText("LoadMotor");
+        PositionMotor.setText("PositionMotor");
+        TempMotor.setText("TempMotor");
+
+        setRndValueTextField(listL);
+        setRndValueTextField(listT);
+        setRndValueTextField(listM);
+
+        rndValueMotorBtn.addActionListener((e) -> {
+            setRndValueTextField(listL);
+            setRndValueTextField(listT);
+            setRndValueTextField(listM);
+        });
+
+        sendMotorDataBtn.addActionListener((e) -> {
+            rbThing.setAllParams(getValueTextField(listL), getValueTextField(listT), getValueTextField(listM));
+            if (httpSender != null) {
+                httpSender.doPostRequest(rbThing, null);
+            } else {
+                connectedLbl.setText("Не установлено соединение! Повторите попытку");
+            }
         });
     }
 
     public RobotGUI(String title) throws HeadlessException {
         super(title);
         initParamsGui();
-
+        motorSettings();
 
         // настройка листенера и объекта для ответа
         manageListener.setEvListener(new RobotGUI.PanelListener());
@@ -107,7 +154,7 @@ public class RobotGUI extends JFrame {
 
         //событие на кнопку коннекта
         connectedBtn.addActionListener(e -> {
-            threadServerSender.interrupt();
+            //threadServerSender.interrupt();
             String url = textFieldUrl.getText();
             String thingName = textFieldThingName.getText();
             String serviceNamr = textFieldServiceName.getText();
@@ -115,7 +162,7 @@ public class RobotGUI extends JFrame {
             httpSender = new SenderServicePostRequestHttpClient(thingName, serviceNamr, appKey, url);
             statusCode = httpSender.getStatusCode();
             if (statusCode != 200) {
-                if(httpSender!=null){
+                if (httpSender != null) {
                     try {
                         httpSender.closeClient();
                     } catch (IOException ioException) {
@@ -143,7 +190,7 @@ public class RobotGUI extends JFrame {
         });
 
 
-        setSize(800, 600);
+        setSize(1200, 600);
         setContentPane(mainPanel);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -206,6 +253,6 @@ public class RobotGUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(()->new RobotGUI("Robot"));
+        SwingUtilities.invokeLater(() -> new RobotGUI("Robot"));
     }
 }
