@@ -41,7 +41,7 @@ public class TestGetPostRequest {
           //  Scanner scanner = new Scanner(connection.getInputStream());
 //            while (scanner.hasNextLine()) {
 //                response += scanner.nextLine();
-//                response += "\n";
+//                response += "\N";
 //            }
 //
 //            System.out.println(connection.getRequestMethod());
@@ -82,7 +82,7 @@ public class TestGetPostRequest {
 //            Scanner scanner = new Scanner(urlConnectionPost.getInputStream());
 //            while (scanner.hasNextLine()) {
 //                response += scanner.nextLine();
-//                response += "\n";
+//                response += "\N";
 //            }
 //
 //            System.out.println(response);
@@ -259,7 +259,7 @@ public class TestGetPostRequest {
 //            Scanner scanner = new Scanner(connection.getInputStream());
 //            while (scanner.hasNextLine()) {
 //                response += scanner.nextLine();
-//                response += "\n";
+//                response += "\N";
 //            }
 //            scanner.close();
 //

@@ -36,6 +36,26 @@ public class RobotThingRq extends AbstractThingClass {
 
     private List<Double> listtT = Arrays.asList(t11, t12, t13, t14, t15, t16);
 
+
+    private volatile int n;
+    private volatile int s1;
+
+    public int getN() {
+        return n;
+    }
+
+    public synchronized void setN(int n) {
+        this.n = n;
+    }
+
+    public int getS1() {
+        return s1;
+    }
+
+    public synchronized void setS1(int s1) {
+        this.s1 = s1;
+    }
+
     public RobotThingRq() {
     }
 
@@ -224,10 +244,12 @@ public class RobotThingRq extends AbstractThingClass {
         }
     }
 
-    public void setAllParams(List<Double> listL, List<Double> listT, List<Double> listM) {
+    public void setAllParams(List<Double> listL, List<Double> listT, List<Double> listM, int n, int s1) {
         initL(listL);
         initM(listM);
         initT(listT);
+        this.n = n;
+        this.s1 = s1;
     }
 
     @Override
@@ -251,6 +273,8 @@ public class RobotThingRq extends AbstractThingClass {
                 ", t14=" + t14 +
                 ", t15=" + t15 +
                 ", t16=" + t16 +
+                ", N=" + n +
+                ", s1=" + s1 +
                 '}';
     }
 }

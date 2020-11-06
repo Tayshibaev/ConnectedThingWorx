@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.EventObject;
 
 
 public class GuiProgramThingWorx extends JFrame {
@@ -174,7 +175,8 @@ public class GuiProgramThingWorx extends JFrame {
     private class PanelListener implements EventRsListenerInterface {
 
         @Override
-        public void actionPerformed(EventRs e) {
+        public void actionPerformed(EventObject k) {
+            EventRs e = (EventRs) k;
             switch (e.getComponent()) {
                 case PANEL1:
                     if (e.isEnable()) {

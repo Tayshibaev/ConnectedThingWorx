@@ -1,13 +1,12 @@
 package GuiProject.RobotGui;
 
-import events.EventRs;
-import interfaces.EventRsListenerInterface;
 import interfaces.InterfaceRs;
 import listeners.EventRsManageListener;
 import main_pakage.SenderServicePostRequestHttpClient;
 import things.AbstractThingClass;
 import things.request.RobotThingRq;
 import things.request.ThingOneRq;
+import things.response.RobotThingRs;
 import things.response.ThingOneRs;
 
 import javax.swing.*;
@@ -72,6 +71,20 @@ public class RobotGUI extends JFrame {
     private JLabel Status;
     private JLabel NumCommand;
     private JButton rndValueMotorBtn;
+    private JLabel G1;
+    private JLabel G1Text;
+    private JLabel X1;
+    private JLabel X1Text;
+    private JLabel Y1;
+    private JLabel Y1Text;
+    private JLabel T1;
+    private JLabel T1Text;
+    private JLabel L1;
+    private JLabel L1Text;
+    private JLabel CurNum;
+    private JLabel CurNumText;
+    private JButton startSendDataServ;
+    private JButton stopSend;
     private JPanel panelOne;
     private JPanel panelTwo;
     private JPanel panelThree;
@@ -93,9 +106,9 @@ public class RobotGUI extends JFrame {
         connectedBtn.setText("Click for Connection to server");
 
         textFieldThingName.setText("Robot_1");
-        textFieldServiceName.setText("robot_service");
-        textFieldAppKey.setText("a99e84db-d28d-4aa8-86b6-2d63b5299d5f");
-        textFieldUrl.setText("https://pp-20101315258i.devportal.ptc.io/Thingworx");
+        textFieldServiceName.setText("IOService");
+        textFieldAppKey.setText("95926316-9fee-40be-956d-fea4f1ae08f3");
+        textFieldUrl.setText("https://pp-20110515127o.devportal.ptc.io/Thingworx");
     }
 
     //Длч установки в текстовые поля рандомных значений
@@ -105,6 +118,7 @@ public class RobotGUI extends JFrame {
         });
     }
 
+    //для получение значений из полей интерфейса
     private List<Double> getValueTextField(List<JTextField> list) {
         List<Double> listD = new ArrayList<>();
         list.forEach((x) -> {
@@ -113,8 +127,20 @@ public class RobotGUI extends JFrame {
         return listD;
     }
 
-    RobotThingRq rbThing = new RobotThingRq();
+    //Проставляет значение в интерфейс из ответа по роботу
+    private void initParamRsRobo(){
+        G1Text.setText(rbThingRs.getG1()+"");
+        T1Text.setText(rbThingRs.getT1()+"");
+        X1Text.setText(rbThingRs.getX1()+"");
+        Y1Text.setText(rbThingRs.getY1()+"");
+        L1Text.setText(rbThingRs.getL1()+"");
+        CurNumText.setText(rbThingRs.getN()+"");
+    }
 
+    RobotThingRq rbThing = new RobotThingRq();
+    RobotThingRs rbThingRs = new RobotThingRs();
+
+    //настройка для моторов
     private void motorSettings() {
 
         sendMotorDataBtn.setText("Отправить данные на сервер");
@@ -122,24 +148,47 @@ public class RobotGUI extends JFrame {
         LoadMotor.setText("LoadMotor");
         PositionMotor.setText("PositionMotor");
         TempMotor.setText("TempMotor");
+        G1.setText("G1");
+        T1.setText("T1");
+        X1.setText("X1");
+        Y1.setText("Y1");
+        L1.setText("L1");
+        CurNum.setText("CurNum");
+        Status.setText("Status");
+        NumCommand.setText("NumCommand");
+        startSendDataServ.setText("startSendDataServ");
+        stopSend.setText("stopSend");
 
+        textStasus.setText("1");
+        textNumCommand.setText("0");
+        int s1 = Integer.parseInt(textStasus.getText());
+        int n = Integer.parseInt(textNumCommand.getText());
+
+        //проставление рандомных значений в полях моторов
         setRndValueTextField(listL);
         setRndValueTextField(listT);
         setRndValueTextField(listM);
-
+        //генерация и проставление рандомных значений по нажатию кнопки
         rndValueMotorBtn.addActionListener((e) -> {
             setRndValueTextField(listL);
             setRndValueTextField(listT);
             setRndValueTextField(listM);
         });
 
+        //по нажатию кнопки отправка данных на сервер
         sendMotorDataBtn.addActionListener((e) -> {
-            rbThing.setAllParams(getValueTextField(listL), getValueTextField(listT), getValueTextField(listM));
+            rbThing.setAllParams(getValueTextField(listL), getValueTextField(listT), getValueTextField(listM), Integer.parseInt(textNumCommand.getText()), Integer.parseInt(textStasus.getText()));
             if (httpSender != null) {
-                httpSender.doPostRequest(rbThing, null);
+                httpSender.doPostRequest(rbThing, rbThingRs);
+                initParamRsRobo();
             } else {
                 connectedLbl.setText("Не установлено соединение! Повторите попытку");
             }
+        });
+
+        
+        startSendDataServ.addActionListener((e)->{
+
         });
     }
 
@@ -149,7 +198,7 @@ public class RobotGUI extends JFrame {
         motorSettings();
 
         // настройка листенера и объекта для ответа
-        manageListener.setEvListener(new RobotGUI.PanelListener());
+      //  manageListener.setEvListener(new RobotGUI.PanelListener());
         thingOneRs.setManageListener(manageListener);
 
         //событие на кнопку коннекта
@@ -211,46 +260,47 @@ public class RobotGUI extends JFrame {
         // pack();
     }
 
-    private class PanelListener implements EventRsListenerInterface {
-
-        @Override
-        public void actionPerformed(EventRs e) {
-            switch (e.getComponent()) {
-                case PANEL1:
-                    if (e.isEnable()) {
-                        panelOne.setBackground(Color.BLUE);
-                    } else {
-                        panelOne.setBackground(Color.BLACK);
-                    }
-                    ;
-                    break;
-                case PANEL2:
-                    if (e.isEnable()) {
-                        panelTwo.setBackground(Color.RED);
-                    } else {
-                        panelTwo.setBackground(Color.BLACK);
-                    }
-                    ;
-                    break;
-                case PANEL3:
-                    if (e.isEnable()) {
-                        panelThree.setBackground(Color.GREEN);
-                    } else {
-                        panelThree.setBackground(Color.BLACK);
-                    }
-                    ;
-                    break;
-                case PANEL4:
-                    if (e.isEnable()) {
-                        panelFour.setBackground(Color.YELLOW);
-                    } else {
-                        panelFour.setBackground(Color.BLACK);
-                    }
-                    ;
-                    break;
-            }
-        }
-    }
+//    private class PanelListener implements EventRsListenerInterface {
+//
+//        @Override
+//        public void actionPerformed(EventObject k) {
+//            EventRs e = (EventRs) k;
+//            switch (e.getComponent()) {
+//                case PANEL1:
+//                    if (e.isEnable()) {
+//                        panelOne.setBackground(Color.BLUE);
+//                    } else {
+//                        panelOne.setBackground(Color.BLACK);
+//                    }
+//                    ;
+//                    break;
+//                case PANEL2:
+//                    if (e.isEnable()) {
+//                        panelTwo.setBackground(Color.RED);
+//                    } else {
+//                        panelTwo.setBackground(Color.BLACK);
+//                    }
+//                    ;
+//                    break;
+//                case PANEL3:
+//                    if (e.isEnable()) {
+//                        panelThree.setBackground(Color.GREEN);
+//                    } else {
+//                        panelThree.setBackground(Color.BLACK);
+//                    }
+//                    ;
+//                    break;
+//                case PANEL4:
+//                    if (e.isEnable()) {
+//                        panelFour.setBackground(Color.YELLOW);
+//                    } else {
+//                        panelFour.setBackground(Color.BLACK);
+//                    }
+//                    ;
+//                    break;
+//            }
+//        }
+//    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new RobotGUI("Robot"));

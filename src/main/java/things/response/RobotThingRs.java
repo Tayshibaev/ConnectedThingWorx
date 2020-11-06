@@ -1,75 +1,109 @@
 package things.response;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import events.EventRs;
+import com.fasterxml.jackson.annotation.*;
 import interfaces.InterfaceRs;
-import listeners.EventRsManageListener;
 import things.AbstractThingClass;
-
-import java.util.logging.Logger;
 
 @JsonAutoDetect
 public class RobotThingRs extends AbstractThingClass implements InterfaceRs {
-    /*
-     * Может быть либо 1, либо 0. Другого не дано
-     * */
-    private int isEnable1;
-    private int isEnable2;
-    private int isEnable3;
-    private int isEnable4;
-
-    /*
-    * Нужно добавить, если нужно отправлять события об изменении данных
-    * */
-
-    private EventRsManageListener manageListener;
+    @JsonProperty("X1")
+    public double X1;
+    @JsonProperty("Y1")
+    public double Y1;
+    @JsonProperty("T1")
+    public double T1;
+    @JsonProperty("G1")
+    public double G1;
+    @JsonProperty("N")
+    public double N;
+    @JsonProperty(value = "L1", access = JsonProperty.Access.READ_WRITE,
+             defaultValue = "L1")
+    public double L1;
 
     public RobotThingRs() {
     }
 
-    public void setManageListener(EventRsManageListener manageListener) {
-        this.manageListener = manageListener;
+    public RobotThingRs(@JsonProperty("X1") double x1,
+                        @JsonProperty("Y1") double y1,
+                        @JsonProperty("T1") double t1,
+                        @JsonProperty("G1") double g1,
+                        @JsonProperty("N") double n,
+                        @JsonProperty("L1") double l1) {
+        this.X1 = x1;
+        this.Y1 = y1;
+        this.T1 = t1;
+        this.G1 = g1;
+        this.N = n;
+        this.L1 = l1;
     }
 
-    public int getIsEnable1() {
-        return isEnable1;
+    @JsonGetter("X1")
+    public double getX1() {
+        return X1;
     }
 
-    public void setIsEnable1(int isEnable1) {
-        this.isEnable1 = isEnable1;
+    @JsonSetter("X1")
+    public void setX1(@JsonProperty("X1") double x1) {
+        this.X1 = x1;
     }
 
-    public int getIsEnable2() {
-        return isEnable2;
+    @JsonGetter("Y1")
+    public double getY1() {
+        return Y1;
     }
 
-    public void setIsEnable2(int isEnable2) {
-        this.isEnable2 = isEnable2;
+    @JsonSetter("Y1")
+    public void setY1(@JsonProperty("Y1") double y1) {
+        this.Y1 = y1;
     }
 
-    public int getIsEnable3() {
-        return isEnable3;
+    @JsonGetter("T1")
+    public double getT1() {
+        return T1;
     }
 
-    public void setIsEnable3(int isEnable3) {
-        this.isEnable3 = isEnable3;
+    @JsonSetter("T1")
+    public void setT1( @JsonProperty("T1") double t1) {
+        this.T1 = t1;
     }
 
-    public int getIsEnable4() {
-        return isEnable4;
+    @JsonGetter("G1")
+    public double getG1() {
+        return G1;
     }
 
-    public void setIsEnable4(int isEnable4) {
-        this.isEnable4 = isEnable4;
+    @JsonSetter("G1")
+    public void setG1(@JsonProperty("G1") double g1) {
+        this.G1 = g1;
     }
+
+    @JsonGetter("N1")
+    public double getN() {
+        return N;
+    }
+
+    @JsonSetter("N1")
+    public void setN( @JsonProperty("N") double n) {
+        this.N = n;
+    }
+
+    @JsonGetter("L1")
+    public double getL1() {
+        return L1;
+    }
+
+    @JsonSetter("L1")
+    public void setL1(@JsonProperty("L1") double L1) { this.L1 = L1; }
 
     @Override
     public String toString() {
-        return "ThingOneRs{" +
-                "isEnable1=" + isEnable1 +
-                ", isEnable2=" + isEnable2 +
-                ", isEnable3=" + isEnable3 +
-                ", isEnable4=" + isEnable4 +
+        return "RobotThingRs{" +
+                "X1=" + X1 +
+                ", Y1=" + Y1 +
+                ", T1=" + T1 +
+                ", G1=" + G1 +
+                ", N=" + N +
+                ", L1=" + L1 +
                 '}';
     }
 
@@ -78,48 +112,13 @@ public class RobotThingRs extends AbstractThingClass implements InterfaceRs {
         if (!(obj instanceof RobotThingRs)) {
             throw new ClassCastException("Передан неверный тип объекта");
         }
-        if (manageListener == null) {
-            Logger logger = Logger.getLogger("Logger2");
-            logger.warning("Невозможно создать событие! Данные обновляться не будут");
-        }
-        RobotThingRs clone = (RobotThingRs) obj;
-        if (this.isEnable1 != clone.isEnable1) {
-            if (clone.isEnable1 == 0 || clone.isEnable1 == 1) {
-                this.isEnable1 = clone.isEnable1;
-                if (manageListener != null) {
-                    manageListener.addEventRs(new EventRs(this, EventRs.ComponentEnum.PANEL1, this.isEnable1 == 0 ? false : true));
-                }
-            }
-        }
+        RobotThingRs rr = (RobotThingRs) obj;
+        this.X1 = rr.X1;
+        this.Y1 = rr.Y1;
+        this.G1 = rr.G1;
+        this.L1 = rr.L1;
+        this.N = rr.N;
+        this.T1 = rr.T1;
 
-        if (this.isEnable2 != clone.isEnable2) {
-            if (clone.isEnable2 == 0 || clone.isEnable2 == 1) {
-                this.isEnable2 = clone.isEnable2;
-                if (manageListener != null) {
-                    manageListener.addEventRs(new EventRs(this, EventRs.ComponentEnum.PANEL2, this.isEnable2 == 0 ? false : true));
-                }
-            }
-        }
-
-        if (this.isEnable3 != clone.isEnable3) {
-            if (clone.isEnable3 == 0 || clone.isEnable3 == 1) {
-                this.isEnable3 = clone.isEnable3;
-                if (manageListener != null) {
-                    manageListener.addEventRs(new EventRs(this, EventRs.ComponentEnum.PANEL3, this.isEnable3 == 0 ? false : true));
-                }
-            }
-        }
-
-        if (this.isEnable4 != clone.isEnable4) {
-            if (clone.isEnable4 == 0 || clone.isEnable4 == 1) {
-                this.isEnable4 = clone.isEnable4;
-                if (manageListener != null) {
-                    manageListener.addEventRs(new EventRs(this, EventRs.ComponentEnum.PANEL4, this.isEnable4 == 0 ? false : true));
-                }
-            }
-        }
-        if (manageListener != null) {
-            manageListener.executedListener();
-        }
     }
 }
