@@ -1,2 +1,2 @@
 # ConnectedThingWorx
-Для обмена данными с ThingWorx
+Декстопное приложение для обмена данными с ThingWorx
